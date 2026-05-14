@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paro — Your Guide to the Right Care, Every Time</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,600;1,9..144,700;1,9..144,800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/paro.css" />
+  <style>
+    /* ── Landing-specific styles ── */
+    .hero { padding-top: 5.5rem; }
+    .step-connector { flex: 1; height: 2px; background: var(--color-border); margin-top: -1.25rem; }
+    .how-step { display:flex; flex-direction:column; align-items:center; text-align:center; gap:0.875rem; flex:1; }
+    .how-step-num {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--color-primary-deep); color: white;
+      font-family: var(--font-heading); font-size: 1.375rem; font-weight: 800;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 4px 18px rgba(30, 58, 30, 0.35); position: relative; z-index: 1;
+      font-variation-settings: 'opsz' 18;
+    }
+    .how-step-title { font-weight: 700; font-size: var(--text-lg); margin-bottom: 0.25rem; }
+    .how-step-desc { font-size: var(--text-sm); color: var(--color-text-muted); max-width: 200px; line-height: 1.6; }
+    .user-card { background: white; border-radius: var(--radius-lg); padding: 1.5rem 1.25rem; border: 1px solid var(--color-border); box-shadow: var(--shadow-card); text-align: center; transition: all var(--transition-base); }
+    .user-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--color-primary-200); }
+    .user-card-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .user-card-title { font-weight: 700; font-size: var(--text-base); margin-bottom: 0.375rem; }
+    .user-card-desc { font-size: var(--text-xs); color: var(--color-text-muted); line-height: 1.55; }
+    .impact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .impact-card { background: white; border-radius: var(--radius-lg); padding: 1.875rem; border: 1px solid var(--color-border); box-shadow: var(--shadow-card); transition: all var(--transition-base); }
+    .impact-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--color-primary-200); }
+    .impact-card-num { font-family: var(--font-heading); font-size: 2.25rem; font-weight: 800; color: var(--color-primary-dark); font-variation-settings: 'opsz' 36; }
+    .impact-card-label { font-size: var(--text-sm); color: var(--color-text-muted); margin-top: 0.375rem; line-height: 1.55; }
+    .comparison-table { width: 100%; border-collapse: collapse; }
+    .comparison-table th { background: var(--color-primary-deep); color: white; padding: 0.875rem 1.25rem; font-size: var(--text-sm); font-weight: 600; text-align: left; letter-spacing: 0.01em; }
+    .comparison-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+    .comparison-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+    .comparison-table td { padding: 0.875rem 1.25rem; font-size: var(--text-sm); border-bottom: 1px solid var(--color-border); }
+    .comparison-table tr:last-child td { border-bottom: none; }
+    .comparison-table tr:nth-child(even) td { background: var(--color-primary-50); }
+    .comparison-table .col-without { color: var(--color-error); }
+    .comparison-table .col-with { color: var(--color-primary-dark); font-weight: 600; }
+    .mockup-phone {
+      width: 280px; height: 570px;
+      background: white; border-radius: 36px;
+      border: 8px solid #1a1a1a;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.22), 0 0 0 2px #333;
+      overflow: hidden; position: relative;
+      animation: floatPhone 4s ease-in-out infinite;
+    }
+    @keyframes floatPhone { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    .mockup-phone::before { content:''; position:absolute; top:0;left:50%;transform:translateX(-50%); width:100px;height:24px; background:#1a1a1a; border-radius:0 0 16px 16px; z-index:10; }
+    .phone-content { height: 100%; overflow: hidden; }
+    .phone-screen { background: var(--color-bg); height: 100%; padding: 2rem 0.875rem 0; }
+    .phone-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
+    .phone-card { background: white; border-radius: 12px; padding: 0.875rem; box-shadow: 0 2px 8px rgba(91,132,91,0.08); margin-bottom: 0.625rem; border: 1px solid var(--color-border); }
+    .phone-match-bar { height: 6px; background: var(--color-primary-100); border-radius: 3px; overflow: hidden; }
+    .phone-match-fill { height: 100%; background: var(--color-primary); border-radius: 3px; }
+    .bg-alt { background: var(--color-bg-alt); }
+    .bg-white { background: white; }
+    .bg-primary { background: var(--color-primary); }
+    @media (max-width: 1024px) { .impact-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .impact-grid { grid-template-columns: 1fr; } .comparison-table td, .comparison-table th { padding: 0.625rem 0.875rem; } }
+  </style>
+</head>
+<body>
+
+<!-- ── TOP NAVIGATION ─────────────────────────── -->
+<nav class="nav-landing">
+  <a href="index.html" class="paro-logo">
+    <div class="paro-logo-mark">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    </div>
+    <span class="paro-logo-text">Paro</span>
+  </a>
+  <div class="nav-links" id="nav-links">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#how-it-works" class="nav-link">Paano Gumagana</a>
+    <a href="#impact" class="nav-link">Impact</a>
+    <a href="community.html" class="nav-link">Komunidad</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:0.75rem;">
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="fil">FIL</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <a href="dashboard.html" class="btn btn-primary btn-sm">Magsimula</a>
+  </div>
+</nav>
+
+<!-- ── HERO ───────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-content animate-fade-up">
+    <div class="hero-badge">
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Medical Assistance Navigator · Manila
+    </div>
+    <h1 class="hero-title" data-fil="Ang iyong gabay<br>sa <span class='highlight'>tamang tulong</span>,<br>sa tamang oras." data-en="Your guide to the<br><span class='highlight'>right care</span>,<br>every time.">
+      Ang iyong gabay<br>sa <span class="highlight">tamang tulong</span>,<br>sa tamang oras.
+    </h1>
+    <p class="hero-subtitle" data-fil="Hindi dapat depende sa kung sino ang mas nakakaintindi ng sistema ang pag-access ng healthcare assistance. Si Paro ang tutulong sa iyo na mahanap ang tamang programa — mabilis, madali, at libre." data-en="Healthcare assistance should not depend on who understands the system better. Paro helps you find the right programs — quickly, easily, and for free.">
+      Hindi dapat depende sa kung sino ang mas nakakaintindi ng sistema ang pag-access ng healthcare assistance. Si Paro ang tutulong sa iyo na mahanap ang tamang programa — mabilis, madali, at libre.
+    </p>
+    <div class="hero-actions">
+      <a href="eligibility.html" class="btn btn-primary btn-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        Hanapin ang Programa Ko
+      </a>
+      <a href="dashboard.html" class="btn btn-secondary btn-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        Tingnan ang Dashboard
+      </a>
+    </div>
+    <p class="hero-note">
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Libre, ligtas, at napapatunayan. Para sa lahat ng Manilenyos.
+    </p>
+    <!-- Mini stats -->
+    <div style="display:flex;gap:2rem;margin-top:2rem;padding-top:2rem;border-top:1px solid var(--color-border);">
+      <div>
+        <div style="font-family:var(--font-heading);font-size:1.5rem;font-weight:800;color:var(--color-primary)" data-counter="12" data-suffix="K+">0</div>
+        <div style="font-size:var(--text-xs);color:var(--color-text-muted)">Programa sa database</div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-heading);font-size:1.5rem;font-weight:800;color:var(--color-primary)" data-counter="304" data-suffix="K">0</div>
+        <div style="font-size:var(--text-xs);color:var(--color-text-muted)">Denied claims na maaaring maiwasan</div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-heading);font-size:1.5rem;font-weight:800;color:var(--color-primary)" data-counter="5" data-suffix=" min">0</div>
+        <div style="font-size:var(--text-xs);color:var(--color-text-muted)">Para makuha ang checklist mo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phone Mockup -->
+  <div class="hero-visual animate-fade-up-delay-2">
+    <div class="mockup-phone">
+      <div class="phone-content">
+        <div class="phone-screen">
+          <div class="phone-topbar">
+            <div style="font-family:var(--font-heading);font-weight:800;font-size:1rem;color:var(--color-text)">Paro</div>
+            <div class="avatar avatar-sm avatar-primary" style="font-size:0.65rem;">JC</div>
+          </div>
+          <div style="font-size:0.65rem;color:var(--color-text-muted);margin-bottom:0.75rem;">3 programa ang nahanap para sa iyo</div>
+          <!-- Program card 1 -->
+          <div class="phone-card">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+              <div style="width:28px;height:28px;background:#2563eb;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+                <span style="color:white;font-size:0.45rem;font-weight:700;">PH</span>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:0.6rem;font-weight:700;color:var(--color-text)">PhilHealth Z Benefit</div>
+                <div style="font-size:0.5rem;color:var(--color-text-muted)">PhilHealth · ₱100,000 coverage</div>
+              </div>
+              <div style="font-size:0.6rem;font-weight:800;color:var(--color-primary)">92%</div>
+            </div>
+            <div class="phone-match-bar"><div class="phone-match-fill" style="width:92%"></div></div>
+          </div>
+          <!-- Program card 2 -->
+          <div class="phone-card">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+              <div style="width:28px;height:28px;background:#dc2626;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+                <span style="color:white;font-size:0.45rem;font-weight:700;">DOH</span>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:0.6rem;font-weight:700;color:var(--color-text)">PCSO Medical Assistance</div>
+                <div style="font-size:0.5rem;color:var(--color-text-muted)">PCSO · Libreng gamot</div>
+              </div>
+              <div style="font-size:0.6rem;font-weight:800;color:var(--color-primary)">85%</div>
+            </div>
+            <div class="phone-match-bar"><div class="phone-match-fill" style="width:85%"></div></div>
+          </div>
+          <!-- Tip card -->
+          <div style="background:var(--color-accent-light);border-radius:8px;padding:0.625rem;border-left:2px solid var(--color-accent);margin-top:0.5rem;">
+            <div style="font-size:0.55rem;font-weight:700;color:var(--color-accent-dark);margin-bottom:0.25rem;">💡 Community Tip</div>
+            <div style="font-size:0.5rem;color:var(--color-text);line-height:1.5">"Magdala ng 3 kopya — Window 4 palaging nagtatanong ng extra."</div>
+          </div>
+          <!-- CTA -->
+          <div style="margin-top:0.875rem;background:var(--color-primary);border-radius:8px;padding:0.625rem;text-align:center;">
+            <span style="color:white;font-size:0.6rem;font-weight:700;">Tingnan ang Aking Checklist →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Floating badges -->
+    <div style="position:absolute;top:-20px;right:-40px;background:white;border-radius:12px;padding:0.625rem 0.875rem;box-shadow:var(--shadow-lg);border:1px solid var(--color-border);display:flex;align-items:center;gap:0.5rem;white-space:nowrap;">
+      <span style="font-size:1rem;">✅</span>
+      <div>
+        <div style="font-size:0.65rem;font-weight:700;">3 Programa ang Nahanap</div>
+        <div style="font-size:0.55rem;color:var(--color-text-muted);">5 minuto · Verified data</div>
+      </div>
+    </div>
+    <div style="position:absolute;bottom:40px;left:-50px;background:white;border-radius:12px;padding:0.625rem 0.875rem;box-shadow:var(--shadow-lg);border:1px solid var(--color-border);display:flex;align-items:center;gap:0.5rem;white-space:nowrap;">
+      <span style="font-size:1rem;">📋</span>
+      <div>
+        <div style="font-size:0.65rem;font-weight:700;">Checklist na-generate</div>
+        <div style="font-size:0.55rem;color:var(--color-text-muted);">4 documents · Downloadable</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS STRIP ─────────────────────────────── -->
+<section class="stats-strip">
+  <div class="stat-item reveal">
+    <div class="stat-number" data-counter="615" data-prefix="₱" data-suffix="B+">₱615B+</div>
+    <div class="stat-label">out-of-pocket healthcare spending ng mga Pilipino noong 2024</div>
+  </div>
+  <div class="stat-item reveal">
+    <div class="stat-number" data-counter="445" data-prefix="₱" data-suffix="M+">₱445M+</div>
+    <div class="stat-label">PhilHealth claims na na-deny dahil sa hindi kumpletong dokumento</div>
+  </div>
+  <div class="stat-item reveal">
+    <div class="stat-number" data-counter="304" data-suffix="K">304K</div>
+    <div class="stat-label">Return-to-Hospital claims noong 2024 — maaaring maiwasan</div>
+  </div>
+  <div class="stat-item reveal">
+    <div class="stat-number" data-counter="12" data-suffix=" araw">12 araw</div>
+    <div class="stat-label">average na nawawalang trabaho bawat aplikasyon dahil sa paulit-ulit na biyahe</div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ───────────────────────────── -->
+<section class="section bg-white" id="how-it-works">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:3.5rem;">
+      <div class="section-eyebrow" style="margin:0 auto 1rem;">Paano Gumagana</div>
+      <h2 class="section-title" style="margin:0 auto 0.75rem;">3 hakbang para sa tamang tulong</h2>
+      <p class="section-desc" style="margin:0 auto;text-align:center;">Hindi na kailangan pang pumunta sa iba't ibang tanggapan para sa impormasyon. Gawin namin ito para sa iyo.</p>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:0;max-width:800px;margin:0 auto;">
+      <div class="how-step reveal reveal-1">
+        <div class="how-step-num">1</div>
+        <div>
+          <div class="how-step-title">Sagutin ang 5 tanong</div>
+          <div class="how-step-desc">Lokasyon, status ng PhilHealth, kondisyon, at uri ng tulong na kailangan.</div>
+        </div>
+      </div>
+      <div class="step-connector" style="margin-top:1.75rem;"></div>
+      <div class="how-step reveal reveal-2">
+        <div class="how-step-num">2</div>
+        <div>
+          <div class="how-step-title">Makita ang mga programa</div>
+          <div class="how-step-desc">Ire-rank ng AI ang mga programa batay sa iyong eligibility score.</div>
+        </div>
+      </div>
+      <div class="step-connector" style="margin-top:1.75rem;"></div>
+      <div class="how-step reveal reveal-3">
+        <div class="how-step-num">3</div>
+        <div>
+          <div class="how-step-title">I-download ang checklist</div>
+          <div class="how-step-desc">Personalized na listahan ng mga dokumento at kung saan pupunta.</div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:3rem;">
+      <a href="eligibility.html" class="btn btn-primary btn-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Subukan Ngayon — Libre
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ───────────────────────────────── -->
+<section class="section" id="features">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:3rem;">
+      <div class="section-eyebrow" style="margin:0 auto 1rem;">Core Features</div>
+      <h2 class="section-title" style="margin:0 auto;">Lahat ng kailangan mo, sa isang lugar</h2>
+    </div>
+    <div class="grid grid-3" style="gap:1.25rem;">
+      <div class="feature-card reveal reveal-1">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+        <div class="feature-title">Guided Eligibility Wizard</div>
+        <div class="feature-desc">5-hakbang na questionnaire: lokasyon → indigency → PhilHealth → diagnosis → uri ng tulong. Sagot sa Filipino.</div>
+      </div>
+      <div class="feature-card reveal reveal-2">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/></svg>
+        </div>
+        <div class="feature-title">AI Matching Engine</div>
+        <div class="feature-desc">Ikukumpara ng AI ang iyong profile sa lahat ng aktibong programa at magbibigay ng ranked na resulta na may confidence score.</div>
+      </div>
+      <div class="feature-card reveal reveal-3">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div class="feature-title">Personalized Checklist</div>
+        <div class="feature-desc">Eksaktong listahan ng mga kailangang dokumento bawat programa. Kasama ang mga downloadable forms at pro tips mula sa komunidad.</div>
+      </div>
+      <div class="feature-card reveal reveal-4">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="feature-title">Verified Data Pipeline</div>
+        <div class="feature-desc">Ang data ay hinuhukay mula sa PhilHealth.gov.ph at DOH.gov.ph araw-araw, nire-review ng AI, at bineberipikahin ng komunidad.</div>
+      </div>
+      <div class="feature-card reveal reveal-5">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="feature-title">Community Contributions</div>
+        <div class="feature-desc">Mga tip mula sa mga barangay health worker, social workers, NGOs, at pasyenteng personal na nakaranas ng proseso.</div>
+      </div>
+      <div class="feature-card reveal reveal-6">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="feature-title">Public Kiosk Ready</div>
+        <div class="feature-desc">Available sa mga public kiosk sa barangay, health center, at ospital. Walang internet o gadget ang kailangan para ma-access ito.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TARGET USERS ───────────────────────────── -->
+<section class="section bg-white">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:3rem;">
+      <div class="section-eyebrow" style="margin:0 auto 1rem;">Para Kanino Ito</div>
+      <h2 class="section-title" style="margin:0 auto;">Dinisenyo para sa bawat Manilenyos</h2>
+    </div>
+    <div class="grid grid-3" style="gap:1.25rem;">
+      <div class="user-card reveal reveal-1">
+        <div class="user-card-icon">👨‍👩‍👧</div>
+        <div class="user-card-title">Mga Pamilya</div>
+        <div class="user-card-desc">Hindi alam kung anong programa ang kwalipikado. Madalas pumunta sa maling tanggapan.</div>
+      </div>
+      <div class="user-card reveal reveal-2">
+        <div class="user-card-icon">👴</div>
+        <div class="user-card-title">Matatanda at PWDs</div>
+        <div class="user-card-desc">Hindi kayang mag-navigate ng multi-office process nang walang tulong. Kailangan ng digital access.</div>
+      </div>
+      <div class="user-card reveal reveal-3">
+        <div class="user-card-icon">💰</div>
+        <div class="user-card-title">Mababang Kita</div>
+        <div class="user-card-desc">Hindi makakayanan ang pagkawala ng sahod sa paulit-ulit na biyahe. Kulang ang internet access sa bahay.</div>
+      </div>
+      <div class="user-card reveal reveal-4">
+        <div class="user-card-icon">🏥</div>
+        <div class="user-card-title">Barangay Health Workers</div>
+        <div class="user-card-desc">Oras ang nagagastos sa mano-manong pananaliksik ng mga requirements para sa bawat residente.</div>
+      </div>
+      <div class="user-card reveal reveal-5">
+        <div class="user-card-icon">🏛️</div>
+        <div class="user-card-title">Pampublikong Ospital</div>
+        <div class="user-card-desc">Overwhelmed sa mga walk-in na sana ay nagka-self-serve na may mas magandang impormasyon.</div>
+      </div>
+      <div class="user-card reveal reveal-6">
+        <div class="user-card-icon">🏙️</div>
+        <div class="user-card-title">LGU — Lungsod ng Maynila</div>
+        <div class="user-card-desc">Walang real-time visibility sa unmet assistance demand bawat barangay.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COMPARISON TABLE ───────────────────────── -->
+<section class="section" id="impact">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:3rem;">
+      <div class="section-eyebrow" style="margin:0 auto 1rem;">Bago at Pagkatapos</div>
+      <h2 class="section-title" style="margin:0 auto;">Ang pagbabago sa bawat buhay</h2>
+    </div>
+    <div class="card reveal" style="overflow:hidden;">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Sitwasyon</th>
+            <th>❌ Bago ang Paro</th>
+            <th>✅ Kasama ang Paro</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Mag-apply ng PhilHealth</strong></td>
+            <td class="col-without">Magtatanong, pupunta sa klinika, ibabalik dahil kulang ang dokumento, uulit</td>
+            <td class="col-with">5-minute wizard → tamang programa + kumpletong dokumento list</td>
+          </tr>
+          <tr>
+            <td><strong>Maghanap ng programa</strong></td>
+            <td class="col-without">Mag-Google ng lumang blog post, maling impormasyon</td>
+            <td class="col-with">Live-scraped, human-verified na opisyal na datos</td>
+          </tr>
+          <tr>
+            <td><strong>Barangay health worker</strong></td>
+            <td class="col-without">Mano-manong naghahanap ng requirements para sa bawat residente</td>
+            <td class="col-with">I-run ang wizard para sa 10 residente sa loob ng 1 oras</td>
+          </tr>
+          <tr>
+            <td><strong>Matandang residente</strong></td>
+            <td class="col-without">Kailangan puntahan ang 3 tanggapan para sa impormasyon</td>
+            <td class="col-with">Pamilya ang nag-check online; nagprint ng checklist sa bahay</td>
+          </tr>
+          <tr>
+            <td><strong>Disaster recovery</strong></td>
+            <td class="col-without">Muling kailangan magsimula sa simula para sa eligibility</td>
+            <td class="col-with">Naka-save na profile — mabilis na re-application</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── IMPACT ─────────────────────────────────── -->
+<section class="section bg-white">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:3rem;">
+      <div class="section-eyebrow" style="margin:0 auto 1rem;">Projected Impact · Manila, Year 1</div>
+      <h2 class="section-title" style="margin:0 auto;">Mga naiambag na pagbabago</h2>
+    </div>
+    <div class="impact-grid">
+      <div class="impact-card reveal">
+        <div class="impact-card-num">Libu-libo</div>
+        <div class="impact-card-label">na hindi kinailangang biyahe sa ospital, barangay office, at PhilHealth branch bawat taon</div>
+      </div>
+      <div class="impact-card reveal">
+        <div class="impact-card-num" data-counter="23" data-suffix=" oras">0</div>
+        <div class="impact-card-label">ang matitipid na oras ng bawat barangay health worker sa community health assistance activities</div>
+      </div>
+      <div class="impact-card reveal">
+        <div class="impact-card-num">Mas Mataas</div>
+        <div class="impact-card-label">na application success rate dahil sa kumpletong at tamang dokumento sa unang pagkakataon</div>
+      </div>
+    </div>
+    <div class="alert alert-info reveal" style="margin-top:1.5rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <strong>Source:</strong> PhilStar (2025), PhilHealth official reports — 304,000+ Return-to-Hospital claims worth ₱4.2B noong 2024 dahil sa mga correctable deficiencies at missing requirements.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA SECTION ────────────────────────────── -->
+<section class="section section-deep" style="text-align:center;">
+  <div class="container" style="position:relative;z-index:1;">
+    <div style="max-width:580px;margin:0 auto;">
+      <div style="font-size:3rem;margin-bottom:1.25rem;line-height:1;">🏥</div>
+      <h2 style="font-family:var(--font-heading);font-size:clamp(1.875rem,3.5vw,2.75rem);font-weight:800;color:white;margin-bottom:1rem;letter-spacing:-0.02em;font-variation-settings:'opsz' 36;" class="reveal">
+        Handa ka na bang hanapin ang<br><em style="color:var(--color-accent);font-style:italic;">tamang tulong</em>?
+      </h2>
+      <p style="color:rgba(255,255,255,0.72);font-size:var(--text-lg);margin-bottom:2.25rem;line-height:1.65;" class="reveal">
+        Sa loob ng 5 minuto, malalaman mo kung anong programa ang para sa iyo — at eksaktong kung ano ang dalhin.
+      </p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;" class="reveal">
+        <a href="eligibility.html" class="btn btn-accent btn-xl btn-pill">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          Magsimula Na
+        </a>
+        <a href="assistant.html" class="btn btn-secondary btn-xl btn-pill" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.9);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Kausapin ang AI
+        </a>
+      </div>
+      <p style="color:rgba(255,255,255,0.42);font-size:var(--text-xs);margin-top:1.5rem;letter-spacing:0.02em;">Libre. Walang account na kailangan. Available 24/7.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────── -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">
+        <a href="index.html" class="paro-logo">
+          <div class="paro-logo-mark" style="background:rgba(255,255,255,0.15);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <span class="paro-logo-text">Paro</span>
+        </a>
+      </div>
+      <p class="footer-desc">"Healthcare assistance should not depend on who understands the system better." — Paro Mission</p>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+        <div class="lang-toggle" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);">
+          <button class="lang-btn active" data-lang="fil" style="color:rgba(255,255,255,0.6)">FIL</button>
+          <button class="lang-btn" data-lang="en" style="color:rgba(255,255,255,0.6)">EN</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <ul class="footer-links">
+        <li><a href="eligibility.html">Eligibility Wizard</a></li>
+        <li><a href="programs.html">Mga Programa</a></li>
+        <li><a href="checklist.html">Requirements Checklist</a></li>
+        <li><a href="tracking.html">Track Application</a></li>
+        <li><a href="assistant.html">AI Assistant</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Komunidad</div>
+      <ul class="footer-links">
+        <li><a href="community.html">Verified Tips</a></li>
+        <li><a href="community.html">Mag-contribute</a></li>
+        <li><a href="#">Para sa BHW</a></li>
+        <li><a href="#">Para sa NGOs</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Tungkol Sa</div>
+      <ul class="footer-links">
+        <li><a href="#">Ang Paro</a></li>
+        <li><a href="#">Data Sources</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+        <li><a href="#">Makipag-ugnayan</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Paro. Ginawa para sa mga Manilenyos. Ideathon Project.</p>
+    <p style="display:flex;gap:0.5rem;align-items:center;">
+      <span style="display:inline-block;width:8px;height:8px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite;"></span>
+      Data last verified: Ngayon
+    </p>
+  </div>
+</footer>
+
+<script src="js/paro.js"></script>
+</body>
+</html>

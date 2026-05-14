@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paro — Komunidad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,600;1,9..144,700;1,9..144,800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/paro.css" />
+  <style>
+    .community-grid { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
+    .tip-feed { display: flex; flex-direction: column; gap: 1rem; }
+    .tip-full-card { background: white; border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.375rem; box-shadow: var(--shadow-card); transition: all var(--transition-base); }
+    .tip-full-card:hover { border-color: var(--color-primary-200); box-shadow: var(--shadow-md); }
+    .tip-card-top { display: flex; align-items: flex-start; gap: 0.875rem; margin-bottom: 0.875rem; }
+    .contributor-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-heading); font-weight: 700; font-size: var(--text-sm); color: white; flex-shrink: 0; }
+    .tip-text-body { font-size: var(--text-sm); line-height: 1.7; color: var(--color-text); margin-bottom: 0.875rem; }
+    .tip-meta-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+    .tip-program-tag { display: inline-flex; align-items: center; gap: 0.25rem; background: var(--color-primary-50); color: var(--color-primary); border: 1px solid var(--color-primary-200); padding: 0.25rem 0.625rem; border-radius: 100px; font-size: 0.65rem; font-weight: 700; }
+    .tip-vote-row { display: flex; align-items: center; gap: 0.75rem; }
+    .vote-btn { display: flex; align-items: center; gap: 0.375rem; border: 1px solid var(--color-border); background: white; border-radius: var(--radius-md); padding: 0.375rem 0.75rem; font-size: var(--text-xs); font-weight: 600; cursor: pointer; transition: all var(--transition-base); color: var(--color-text-muted); }
+    .vote-btn.voted { background: var(--color-primary-50); border-color: var(--color-primary); color: var(--color-primary); }
+    .vote-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .flag-btn { display: flex; align-items: center; gap: 0.25rem; background: none; border: none; font-size: var(--text-xs); color: var(--color-text-muted); cursor: pointer; padding: 0.375rem; transition: color var(--transition-base); }
+    .flag-btn:hover { color: var(--color-error); }
+    .verified-badge { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.65rem; font-weight: 700; color: var(--color-success); }
+    .trust-bar { display: flex; flex-direction: column; gap: 0.625rem; }
+    .trust-level-row { display: flex; align-items: center; gap: 0.625rem; }
+    .trust-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .filter-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .filter-chip { border: 1.5px solid var(--color-border); background: white; color: var(--color-text-muted); border-radius: 100px; padding: 0.375rem 0.875rem; font-size: var(--text-xs); font-weight: 600; cursor: pointer; transition: all var(--transition-base); }
+    .filter-chip.active, .filter-chip:hover { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+    .submit-form { background: white; border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.375rem; box-shadow: var(--shadow-card); }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-secondary); margin-bottom: 0.375rem; }
+    .form-control { width: 100%; box-sizing: border-box; border: 1.5px solid var(--color-border); border-radius: var(--radius-md); padding: 0.625rem 0.875rem; font-family: var(--font-body); font-size: var(--text-sm); outline: none; transition: border-color var(--transition-base); }
+    .form-control:focus { border-color: var(--color-primary); }
+    textarea.form-control { resize: vertical; min-height: 88px; }
+    select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; }
+    @media(max-width:1024px){ .community-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ───────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html" class="paro-logo">
+      <div class="paro-logo-mark"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+      <span class="paro-logo-text">Paro</span>
+    </a>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="eligibility.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      Eligibility Wizard
+    </a>
+    <a href="programs.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect width="6" height="4" x="9" y="3" rx="1"/></svg>
+      Mga Programa
+    </a>
+    <a href="checklist.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Requirements
+    </a>
+    <a href="documents.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Mga Dokumento
+    </a>
+    <a href="tracking.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Application Tracker
+    </a>
+    <div class="sidebar-section-label">Komunidad</div>
+    <a href="community.html" class="sidebar-nav-item active">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Verified Tips
+    </a>
+    <a href="assistant.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      AI Assistant
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar avatar-md avatar-primary">JC</div>
+      <div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:var(--text-sm);">Juan Carlos A.</div><div style="font-size:var(--text-xs);color:var(--color-text-muted);">Sampaloc, Manila</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── TOPBAR ─────────────────────────────────── -->
+<header class="topbar">
+  <div>
+    <div style="font-family:var(--font-heading);font-size:var(--text-lg);font-weight:700;">Mga Verified Tips ng Komunidad</div>
+    <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Mga payo mula sa mga BHW, pasyente, at healthcare workers</div>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:0.75rem;">
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="fil">FIL</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <div class="avatar avatar-md avatar-primary">JC</div>
+  </div>
+</header>
+
+<!-- ── MAIN CONTENT ───────────────────────────── -->
+<main class="main-content">
+
+  <!-- Moderation Notice -->
+  <div class="alert alert-info" style="margin-bottom:1.5rem;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <div>Lahat ng mga tip na ipinapakita dito ay <strong>na-verify ng aming moderation team</strong> bago i-publish. Ang mga tip na may ⭐ ay mula sa licensed healthcare professionals o government workers.</div>
+  </div>
+
+  <!-- Filter chips -->
+  <div class="filter-chips" id="filter-chips">
+    <button class="filter-chip active" data-filter="all">Lahat</button>
+    <button class="filter-chip" data-filter="philhealth">PhilHealth</button>
+    <button class="filter-chip" data-filter="pcso">PCSO</button>
+    <button class="filter-chip" data-filter="doh">DOH / Malasakit</button>
+    <button class="filter-chip" data-filter="barangay">Barangay</button>
+    <button class="filter-chip" data-filter="documents">Mga Dokumento</button>
+  </div>
+
+  <div class="community-grid">
+    <!-- TIP FEED -->
+    <div>
+      <div style="font-family:var(--font-heading);font-size:var(--text-lg);font-weight:700;margin-bottom:1rem;">128 Verified Tips</div>
+      <div class="tip-feed" id="tip-feed">
+
+        <!-- TIP 1 -->
+        <div class="tip-full-card" data-tags="pcso documents">
+          <div class="tip-card-top">
+            <div class="contributor-avatar" style="background:var(--color-primary);">MA</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.25rem;">
+                <span class="contributor-badge cb-bhw">BHW · Sampaloc</span>
+                <span class="verified-badge"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Verified</span>
+              </div>
+              <div style="font-weight:700;font-size:var(--text-sm);">Maria Alvarado</div>
+              <div style="font-size:0.65rem;color:var(--color-text-muted);">Na-verify: Abril 2025 · 3 taon na BHW</div>
+            </div>
+          </div>
+          <div class="tip-text-body">"Para sa PCSO, pumunta sa <strong>PCSO main office mismo</strong> at huwag umasa sa online o sa fixers. Mas mabilis kung personal kang pumunta. Magdala ng <strong>dalawang kopya ng lahat ng dokumento</strong> — original at photocopy — dahil palaging may hihingin na dagdag."</div>
+          <div class="tip-meta-row">
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="tip-program-tag">PCSO</span>
+              <span class="tip-program-tag">Mga Dokumento</span>
+            </div>
+            <div class="tip-vote-row">
+              <button class="vote-btn" data-upvote="234">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                234
+              </button>
+              <button class="flag-btn" title="I-flag ang tip na ito">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                I-flag
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIP 2 -->
+        <div class="tip-full-card" data-tags="philhealth documents">
+          <div class="tip-card-top">
+            <div class="contributor-avatar" style="background:#7c3aed;">RD</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.25rem;">
+                <span class="contributor-badge cb-doctor">Social Worker · PGH</span>
+                <span class="verified-badge"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Verified ⭐</span>
+              </div>
+              <div style="font-weight:700;font-size:var(--text-sm);">Rizalyn Dela Cruz, RSW</div>
+              <div style="font-size:0.65rem;color:var(--color-text-muted);">Na-verify: Mayo 2025 · Licensed Social Worker</div>
+            </div>
+          </div>
+          <div class="tip-text-body">"Ang <strong>MDR (Member Data Record)</strong> ng PhilHealth ay maaaring ma-download sa <strong>philhealth.gov.ph</strong> nang libre. Hindi na kailangang pumunta sa PhilHealth office para dito — makatipid ka ng oras. I-print agad at dalhin sa ospital."</div>
+          <div class="tip-meta-row">
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="tip-program-tag">PhilHealth</span>
+              <span class="tip-program-tag">Mga Dokumento</span>
+            </div>
+            <div class="tip-vote-row">
+              <button class="vote-btn" data-upvote="189">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                189
+              </button>
+              <button class="flag-btn" title="I-flag"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>I-flag</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIP 3 -->
+        <div class="tip-full-card" data-tags="doh barangay">
+          <div class="tip-card-top">
+            <div class="contributor-avatar" style="background:#d97706;">JP</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.25rem;">
+                <span class="contributor-badge cb-patient">Pasyente · Tondo</span>
+                <span class="verified-badge"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Verified</span>
+              </div>
+              <div style="font-weight:700;font-size:var(--text-sm);">Jose Peralta</div>
+              <div style="font-size:0.65rem;color:var(--color-text-muted);">Na-verify: Marso 2025 · Personal na karanasan</div>
+            </div>
+          </div>
+          <div class="tip-text-body">"Sa <strong>Malasakit Center ng PGH</strong>, mas mabilis kung pumunta ka ng Martes o Miyerkules ng umaga bago mag-10am. Ang Lunes ay palaging masikip dahil maraming nagrereklamo. May libreng number system sila kaya hindi mo na kailangang magtayo nang matagal."</div>
+          <div class="tip-meta-row">
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="tip-program-tag">DOH / Malasakit</span>
+            </div>
+            <div class="tip-vote-row">
+              <button class="vote-btn voted" data-upvote="156">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                156
+              </button>
+              <button class="flag-btn" title="I-flag"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>I-flag</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIP 4 -->
+        <div class="tip-full-card" data-tags="barangay documents">
+          <div class="tip-card-top">
+            <div class="contributor-avatar" style="background:#0891b2;">AS</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.25rem;">
+                <span class="contributor-badge cb-bhw">BHW · Sta. Mesa</span>
+                <span class="verified-badge"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Verified</span>
+              </div>
+              <div style="font-weight:700;font-size:var(--text-sm);">Ana Santos</div>
+              <div style="font-size:0.65rem;color:var(--color-text-muted);">Na-verify: Pebrero 2025 · 8 taon na BHW</div>
+            </div>
+          </div>
+          <div class="tip-text-body">"Ang <strong>Certificate of Indigency</strong> mula sa barangay ay <strong>may bisa lamang ng 3 buwan</strong>. Huwag mag-apply ng programa kung lumang-luma na ang hawak mong Certificate — baka ma-reject pa ang application mo. Palakumin at i-renew agad."</div>
+          <div class="tip-meta-row">
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="tip-program-tag">Barangay</span>
+              <span class="tip-program-tag">Mga Dokumento</span>
+            </div>
+            <div class="tip-vote-row">
+              <button class="vote-btn" data-upvote="142">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                142
+              </button>
+              <button class="flag-btn" title="I-flag"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>I-flag</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIP 5 -->
+        <div class="tip-full-card" data-tags="philhealth">
+          <div class="tip-card-top">
+            <div class="contributor-avatar" style="background:#dc2626;">DR</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.25rem;">
+                <span class="contributor-badge cb-doctor">Doctor · UP-PGH</span>
+                <span class="verified-badge"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Verified ⭐</span>
+              </div>
+              <div style="font-weight:700;font-size:var(--text-sm);">Dr. Roel Macaraig, MD</div>
+              <div style="font-size:0.65rem;color:var(--color-text-muted);">Na-verify: Mayo 2025 · Oncologist</div>
+            </div>
+          </div>
+          <div class="tip-text-body">"Para sa PhilHealth Z Benefit ng cancer patients, <strong>ang hospital mismo ang mag-a-avail para sa iyo</strong> — hindi mo na kailangang pumunta sa PhilHealth office nang hiwalay. Tanungin mo ang Social Work department ng ospital para tulungan ka. Sila na ang mag-aasikaso ng paperwork."</div>
+          <div class="tip-meta-row">
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="tip-program-tag">PhilHealth</span>
+            </div>
+            <div class="tip-vote-row">
+              <button class="vote-btn" data-upvote="287">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                287
+              </button>
+              <button class="flag-btn" title="I-flag"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>I-flag</button>
+            </div>
+          </div>
+        </div>
+
+        <button style="display:block;width:100%;padding:0.875rem;background:var(--color-primary-50);border:1.5px dashed var(--color-primary-200);border-radius:var(--radius-lg);color:var(--color-primary);font-weight:700;font-size:var(--text-sm);cursor:pointer;transition:all var(--transition-base);" onmouseenter="this.style.background='var(--color-primary)';this.style.color='white'" onmouseleave="this.style.background='var(--color-primary-50)';this.style.color='var(--color-primary)'">
+          Mag-load ng higit pang mga tip →
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div>
+      <!-- Submit form -->
+      <div class="submit-form" style="margin-bottom:1.25rem;">
+        <div style="font-family:var(--font-heading);font-size:var(--text-base);font-weight:700;margin-bottom:0.25rem;">Mag-share ng Tip</div>
+        <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:1rem;">Mayroon kang natuklasan na makakatulong sa iba? I-share ito dito.</div>
+
+        <div class="form-group">
+          <label class="form-label">Iyong role</label>
+          <select class="form-control" id="role-select">
+            <option value="">Piliin ang iyong papel…</option>
+            <option value="bhw">Barangay Health Worker (BHW)</option>
+            <option value="patient">Pasyente / Dating pasyente</option>
+            <option value="social-worker">Social Worker</option>
+            <option value="doctor">Doktor / Nurse</option>
+            <option value="ngo">NGO / Volunteer</option>
+            <option value="family">Pamilya ng pasyente</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Program na tinutukoy</label>
+          <select class="form-control" id="program-select">
+            <option value="">Piliin ang programa…</option>
+            <option value="philhealth">PhilHealth</option>
+            <option value="pcso">PCSO</option>
+            <option value="doh">DOH / Malasakit Center</option>
+            <option value="dswd">DSWD</option>
+            <option value="barangay">Barangay / LGU</option>
+            <option value="general">Pangkalahatan</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ang iyong tip</label>
+          <textarea class="form-control" id="tip-text" placeholder="Ibahagi ang iyong karanasan o payo para sa ibang pasyente…"></textarea>
+          <div style="font-size:0.65rem;color:var(--color-text-muted);margin-top:0.25rem;" id="char-count">0 / 400 characters</div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:1rem;padding:0.75rem;background:var(--color-primary-50);border-radius:var(--radius-md);border:1px solid var(--color-primary-200);">
+          <input type="checkbox" id="agree-guidelines" style="margin-top:2px;flex-shrink:0;accent-color:var(--color-primary);" />
+          <label for="agree-guidelines" style="font-size:var(--text-xs);color:var(--color-text-secondary);line-height:1.5;">Sumasang-ayon ako sa <a href="#" style="color:var(--color-primary);font-weight:700;">community guidelines</a>. Hindi ako maglalagay ng maling impormasyon o mapanlinlang na nilalaman.</label>
+        </div>
+
+        <button id="submit-tip-btn" class="btn btn-primary btn-full" style="pointer-events:none;opacity:0.5;">I-submit ang Tip</button>
+        <div style="text-align:center;font-size:0.65rem;color:var(--color-text-muted);margin-top:0.5rem;">Ang lahat ng submissions ay sinusuri ng aming team bago i-publish.</div>
+      </div>
+
+      <!-- Trust level legend -->
+      <div class="card">
+        <div class="card-body" style="padding:1.125rem;">
+          <div style="font-family:var(--font-heading);font-size:var(--text-sm);font-weight:700;margin-bottom:0.875rem;">Contributor Trust Levels</div>
+          <div class="trust-bar">
+            <div class="trust-level-row">
+              <div class="trust-dot" style="background:#15803d;"></div>
+              <div style="flex:1;"><div style="font-size:var(--text-xs);font-weight:700;display:flex;align-items:center;gap:0.25rem;">Doktor / Licensed Health Worker ⭐<span class="verified-badge" style="margin-left:4px;"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Pinaka-maaasahan</span></div><div style="font-size:0.6rem;color:var(--color-text-muted);">Verified professional license</div></div>
+            </div>
+            <div class="trust-level-row">
+              <div class="trust-dot" style="background:var(--color-primary);"></div>
+              <div style="flex:1;"><div style="font-size:var(--text-xs);font-weight:700;">BHW / Social Worker</div><div style="font-size:0.6rem;color:var(--color-text-muted);">Gov't-affiliated community health workers</div></div>
+            </div>
+            <div class="trust-level-row">
+              <div class="trust-dot" style="background:#f59e0b;"></div>
+              <div style="flex:1;"><div style="font-size:var(--text-xs);font-weight:700;">NGO / Volunteer</div><div style="font-size:0.6rem;color:var(--color-text-muted);">Registered non-profit organization</div></div>
+            </div>
+            <div class="trust-level-row">
+              <div class="trust-dot" style="background:#6b7280;"></div>
+              <div style="flex:1;"><div style="font-size:var(--text-xs);font-weight:700;">Pasyente / Pamilya</div><div style="font-size:0.6rem;color:var(--color-text-muted);">Personal na karanasan, na-verify ng team</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ── BOTTOM NAV (mobile) ───────────────────── -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/></svg>
+    Home
+  </a>
+  <a href="eligibility.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    Wizard
+  </a>
+  <a href="community.html" class="bottom-nav-item active">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    Tips
+  </a>
+  <a href="tracking.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Tracker
+  </a>
+  <a href="assistant.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    AI
+  </a>
+</nav>
+
+<script src="js/paro.js"></script>
+<script>
+// Filter chips
+document.querySelectorAll('#filter-chips .filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#filter-chips .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    const f = chip.dataset.filter;
+    document.querySelectorAll('#tip-feed .tip-full-card').forEach(card => {
+      const tags = card.dataset.tags || '';
+      card.style.display = (f === 'all' || tags.includes(f)) ? 'block' : 'none';
+    });
+  });
+});
+
+// Upvote buttons
+document.querySelectorAll('.vote-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const wasVoted = btn.classList.contains('voted');
+    btn.classList.toggle('voted');
+    const count = parseInt(btn.dataset.upvote);
+    btn.dataset.upvote = wasVoted ? count - 1 : count + 1;
+    btn.childNodes[btn.childNodes.length - 1].textContent = ' ' + btn.dataset.upvote;
+  });
+});
+
+// Submit form validation
+const agreeChk = document.getElementById('agree-guidelines');
+const roleEl   = document.getElementById('role-select');
+const tipEl    = document.getElementById('tip-text');
+const submitBtn = document.getElementById('submit-tip-btn');
+const charCount = document.getElementById('char-count');
+
+function validateForm() {
+  const ok = agreeChk.checked && roleEl.value && tipEl.value.trim().length >= 20;
+  submitBtn.style.opacity = ok ? '1' : '0.5';
+  submitBtn.style.pointerEvents = ok ? 'auto' : 'none';
+}
+
+[agreeChk, roleEl, tipEl].forEach(el => el.addEventListener('change', validateForm));
+tipEl.addEventListener('input', () => {
+  charCount.textContent = `${tipEl.value.length} / 400 characters`;
+  validateForm();
+});
+
+submitBtn.addEventListener('click', () => {
+  if (typeof showToast === 'function') {
+    showToast('Salamat! Ang iyong tip ay isinumite na para sa review.', 'success');
+  }
+  tipEl.value = ''; roleEl.value = ''; agreeChk.checked = false;
+  charCount.textContent = '0 / 400 characters';
+  validateForm();
+});
+</script>
+</body>
+</html>

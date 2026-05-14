@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paro — AI Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,600;1,9..144,700;1,9..144,800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/paro.css" />
+  <style>
+    .chat-layout { display: flex; flex-direction: column; height: calc(100vh - 60px); overflow: hidden; }
+    .chat-body { display: flex; flex: 1; gap: 1.25rem; overflow: hidden; }
+    .chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .chat-sidebar-panel { width: 288px; flex-shrink: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+    .chat-messages-scroll { flex: 1; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; scrollbar-width: thin; scrollbar-color: var(--color-border) transparent; }
+    .chat-input-bar { padding: 0.875rem 1.25rem; border-top: 1px solid var(--color-border); background: white; }
+    .chat-input-row { display: flex; gap: 0.625rem; align-items: flex-end; }
+    .chat-input-row textarea { flex: 1; border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 0.75rem 1rem; font-family: var(--font-body); font-size: var(--text-sm); resize: none; outline: none; min-height: 44px; max-height: 120px; line-height: 1.5; transition: border-color var(--transition-base); }
+    .chat-input-row textarea:focus { border-color: var(--color-primary); }
+    .chat-send-btn { width: 44px; height: 44px; background: var(--color-primary); color: white; border: none; border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all var(--transition-base); }
+    .chat-send-btn:hover { background: var(--color-primary-dark); transform: scale(1.03); }
+    .prompt-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .prompt-chip { background: var(--color-primary-50); color: var(--color-primary); border: 1px solid var(--color-primary-200); border-radius: 100px; padding: 0.375rem 0.875rem; font-size: var(--text-xs); font-weight: 600; cursor: pointer; transition: all var(--transition-base); white-space: nowrap; }
+    .prompt-chip:hover { background: var(--color-primary); color: white; }
+    .context-card { background: white; border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 1rem; }
+    .context-card-title { font-family: var(--font-heading); font-size: var(--text-sm); font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+    .prog-context-row { display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem 0; border-bottom: 1px solid var(--color-border); }
+    .prog-context-row:last-child { border-bottom: none; }
+    .prog-context-dot { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: 700; color: white; flex-shrink: 0; }
+    .prog-context-name { font-size: var(--text-xs); font-weight: 600; }
+    .prog-context-score { margin-left: auto; font-size: var(--text-xs); font-weight: 700; color: var(--color-primary); }
+    .typing-dots { display: flex; gap: 3px; align-items: center; padding: 0.125rem 0; }
+    .typing-dots span { width: 6px; height: 6px; background: var(--color-text-muted); border-radius: 50%; animation: dotBounce 1.3s ease-in-out infinite; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dotBounce { 0%,80%,100%{transform:scale(0.7);opacity:0.5}40%{transform:scale(1);opacity:1} }
+    .chat-info-card { background: var(--color-primary-50); border: 1px solid var(--color-primary-200); border-radius: var(--radius-md); padding: 0.875rem 1rem; margin-top: 0.5rem; }
+    .chat-info-card-title { font-size: var(--text-xs); font-weight: 700; color: var(--color-primary); margin-bottom: 0.375rem; }
+    .chat-info-card-body { font-size: var(--text-xs); color: var(--color-text-secondary); }
+    @media(max-width:1024px){ .chat-sidebar-panel { display: none; } }
+    @media(max-width:768px){ .chat-messages-scroll { padding: 0.875rem; } .chat-input-bar { padding: 0.75rem; } }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ───────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html" class="paro-logo">
+      <div class="paro-logo-mark"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+      <span class="paro-logo-text">Paro</span>
+    </a>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="eligibility.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      Eligibility Wizard
+    </a>
+    <a href="programs.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect width="6" height="4" x="9" y="3" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
+      Mga Programa
+      <span class="badge badge-primary nav-badge">5</span>
+    </a>
+    <a href="checklist.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Requirements
+    </a>
+    <a href="documents.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Mga Dokumento
+    </a>
+    <a href="tracking.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Application Tracker
+    </a>
+    <div class="sidebar-section-label">Komunidad</div>
+    <a href="community.html" class="sidebar-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Verified Tips
+    </a>
+    <a href="assistant.html" class="sidebar-nav-item active">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      AI Assistant
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar avatar-md avatar-primary">JC</div>
+      <div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:var(--text-sm);">Juan Carlos A.</div><div style="font-size:var(--text-xs);color:var(--color-text-muted);">Sampaloc, Manila</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── TOPBAR ─────────────────────────────────── -->
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:0.75rem;">
+    <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--color-primary),var(--color-primary-dark));border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div>
+      <div style="font-family:var(--font-heading);font-size:var(--text-base);font-weight:700;">Paro AI Assistant</div>
+      <div style="font-size:0.65rem;color:var(--color-text-muted);display:flex;align-items:center;gap:0.3rem;">
+        <span style="width:6px;height:6px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
+        Online · Sumasagot sa Filipino at English
+      </div>
+    </div>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:0.75rem;">
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="fil">FIL</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <button id="clear-chat" style="background:none;border:1px solid var(--color-border);cursor:pointer;padding:0.375rem 0.75rem;border-radius:var(--radius-md);font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);transition:all var(--transition-base);">Baguhin ang chat</button>
+  </div>
+</header>
+
+<!-- ── CHAT LAYOUT ────────────────────────────── -->
+<main class="main-content" style="padding:0;overflow:hidden;display:flex;flex-direction:column;height:calc(100vh - 60px);">
+  <div class="chat-body">
+    <!-- Messages area -->
+    <div class="chat-main">
+      <div class="chat-messages-scroll" id="chat-messages">
+        <!-- Intro message -->
+        <div class="chat-message bot">
+          <div class="chat-avatar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div>
+            <div class="chat-bubble">
+              <div style="font-weight:700;margin-bottom:0.375rem;">Kumusta, Juan Carlos! Ako si Paro. 👋</div>
+              <div>Nandito ako para tulungan kang mag-navigate sa mga medical assistance programs sa Manila. Maaari mo akong tanungin tungkol sa:</div>
+              <ul style="margin:0.5rem 0 0;padding-left:1.25rem;font-size:var(--text-sm);line-height:1.8;">
+                <li>Mga programang puwede mong ma-avail</li>
+                <li>Mga dokumentong kailangan mo</li>
+                <li>Proseso ng application</li>
+                <li>PhilHealth, PCSO, DOH, o LGU programs</li>
+              </ul>
+            </div>
+            <div class="chat-time">Paro · Ngayon</div>
+          </div>
+        </div>
+
+        <!-- Suggested prompts shown as part of intro -->
+        <div style="padding-left:3rem;">
+          <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:0.5rem;font-weight:600;">Mabilis na tanong:</div>
+          <div class="prompt-chips" id="prompt-chips">
+            <button class="prompt-chip" data-prompt="Paano mag-apply ng PhilHealth Z Benefit?">📋 Paano mag-apply ng PhilHealth Z Benefit?</button>
+            <button class="prompt-chip" data-prompt="Anong mga dokumento ang kailangan ko para sa PCSO?">📁 Anong dokumento ang kailangan para sa PCSO?</button>
+            <button class="prompt-chip" data-prompt="Nasaan ang pinakamalapit na Malasakit Center sa Sampaloc?">📍 Malasakit Center sa Sampaloc?</button>
+            <button class="prompt-chip" data-prompt="Eligible ba ako sa 4Ps kahit wala akong PhilHealth?">❓ Eligible ba sa 4Ps kahit walang PhilHealth?</button>
+            <button class="prompt-chip" data-prompt="Magkano ang maximum na benepisyo ng DOH AHFP program?">💰 Magkano ang benepisyo ng DOH AHFP?</button>
+            <button class="prompt-chip" data-prompt="Anong ibig sabihin ng na-return ang application ko?">🔄 Anong ibig sabihin ng na-return?</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input bar -->
+      <div class="chat-input-bar">
+        <div class="chat-input-row">
+          <button title="I-attach ang file" style="background:none;border:1px solid var(--color-border);border-radius:var(--radius-md);padding:0.5rem;cursor:pointer;color:var(--color-text-muted);transition:all var(--transition-base);flex-shrink:0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <textarea id="chat-input" placeholder="Magtanong sa Filipino o English…" rows="1" onkeydown="handleEnter(event)"></textarea>
+          <button class="chat-send-btn" id="chat-send" title="Ipadala">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div style="margin-top:0.5rem;font-size:0.65rem;color:var(--color-text-muted);text-align:center;">Ang Paro AI ay nagbibigay ng general na impormasyon. Para sa official na desisyon, makipag-ugnayan sa tamang ahensya.</div>
+      </div>
+    </div>
+
+    <!-- Right context sidebar -->
+    <div class="chat-sidebar-panel" style="padding:1.25rem 1.25rem 1.25rem 0;">
+      <!-- User profile context -->
+      <div class="context-card">
+        <div class="context-card-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Iyong Profile
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div style="display:flex;justify-content:space-between;"><span style="font-size:var(--text-xs);color:var(--color-text-muted);">Barangay</span><span style="font-size:var(--text-xs);font-weight:600;">Sampaloc, Manila</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="font-size:var(--text-xs);color:var(--color-text-muted);">PhilHealth</span><span style="font-size:var(--text-xs);font-weight:600;color:var(--color-success);">Active Ind. Paying</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="font-size:var(--text-xs);color:var(--color-text-muted);">Kondisyon</span><span style="font-size:var(--text-xs);font-weight:600;">Cancer (Stage 2)</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="font-size:var(--text-xs);color:var(--color-text-muted);">Asistansya</span><span style="font-size:var(--text-xs);font-weight:600;">Financial + Gamot</span></div>
+        </div>
+        <a href="eligibility.html" style="display:block;text-align:center;margin-top:0.75rem;font-size:var(--text-xs);font-weight:700;color:var(--color-primary);text-decoration:none;padding:0.375rem;border:1px solid var(--color-primary-200);border-radius:var(--radius-md);background:var(--color-primary-50);">I-update ang profile →</a>
+      </div>
+
+      <!-- Matched programs -->
+      <div class="context-card">
+        <div class="context-card-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect width="6" height="4" x="9" y="3" rx="1"/></svg>
+          Mga Matched Program
+        </div>
+        <div class="prog-context-row">
+          <div class="prog-context-dot" style="background:#2563eb;">PH</div>
+          <div><div class="prog-context-name">PhilHealth Z Benefit</div><div style="font-size:0.6rem;color:var(--color-text-muted);">₱100K coverage</div></div>
+          <div class="prog-context-score">92%</div>
+        </div>
+        <div class="prog-context-row">
+          <div class="prog-context-dot" style="background:#059669;">PC</div>
+          <div><div class="prog-context-name">PCSO IMAP</div><div style="font-size:0.6rem;color:var(--color-text-muted);">Hanggang ₱65K</div></div>
+          <div class="prog-context-score">87%</div>
+        </div>
+        <div class="prog-context-row">
+          <div class="prog-context-dot" style="background:#dc2626;">MC</div>
+          <div><div class="prog-context-name">Malasakit Center</div><div style="font-size:0.6rem;color:var(--color-text-muted);">One-stop-shop</div></div>
+          <div class="prog-context-score">85%</div>
+        </div>
+        <a href="programs.html" style="display:block;text-align:center;margin-top:0.75rem;font-size:var(--text-xs);font-weight:700;color:var(--color-primary);text-decoration:none;padding:0.375rem;border:1px solid var(--color-primary-200);border-radius:var(--radius-md);background:var(--color-primary-50);">Lahat ng programa →</a>
+      </div>
+
+      <!-- Quick resources -->
+      <div class="context-card">
+        <div class="context-card-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Mabilis na Links
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+          <a href="checklist.html" style="font-size:var(--text-xs);color:var(--color-primary);font-weight:600;text-decoration:none;display:flex;align-items:center;gap:0.375rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            Checklist ng Z Benefit
+          </a>
+          <a href="documents.html" style="font-size:var(--text-xs);color:var(--color-primary);font-weight:600;text-decoration:none;display:flex;align-items:center;gap:0.375rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            I-upload ang mga dokumento
+          </a>
+          <a href="tracking.html" style="font-size:var(--text-xs);color:var(--color-primary);font-weight:600;text-decoration:none;display:flex;align-items:center;gap:0.375rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            I-track ang application
+          </a>
+          <a href="community.html" style="font-size:var(--text-xs);color:var(--color-primary);font-weight:600;text-decoration:none;display:flex;align-items:center;gap:0.375rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            Community tips
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ── BOTTOM NAV (mobile) ───────────────────── -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+    Home
+  </a>
+  <a href="eligibility.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    Wizard
+  </a>
+  <a href="programs.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect width="6" height="4" x="9" y="3" rx="1"/></svg>
+    Programa
+  </a>
+  <a href="tracking.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Tracker
+  </a>
+  <a href="assistant.html" class="bottom-nav-item active">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    AI
+  </a>
+</nav>
+
+<script src="js/paro.js"></script>
+<script>
+const messagesEl = document.getElementById('chat-messages');
+const inputEl    = document.getElementById('chat-input');
+const sendBtn    = document.getElementById('chat-send');
+
+const BOT_RESPONSES = {
+  'philhealth z': {
+    text: 'Ang <strong>PhilHealth Z Benefit Package</strong> ay nagbibigay ng comprehensive coverage para sa mga malubhang sakit tulad ng cancer, leukemia, at iba pa. Para ma-avail ito:',
+    steps: ['Kailangan mong maging PhilHealth member (Active)', 'Pumunta sa accredited na hospital', 'Ipakita ang iyong PhilHealth ID at MDR', 'Makipagtulungan sa Social Work officer ng hospital'],
+    link: { text: 'Tingnan ang buong checklist ng Z Benefit', href: 'checklist.html' }
+  },
+  'philhealth': {
+    text: 'Para sa <strong>PhilHealth</strong>, may dalawang paraan ng pag-apply: sa pamamagitan ng iyong employer (Employed), o mag-enroll bilang Individual Paying Member (OFW, self-employed, o informal sector). Ang monthly contribution ay nagsisimula sa ₱300/month.',
+    steps: ['Pumunta sa pinakamalapit na PhilHealth branch', 'Magdala ng valid ID at 1x1 picture', 'Punan ang Member Registration Form (PMRF)', 'Bayaran ang contribution'],
+  },
+  'pcso': {
+    text: 'Ang <strong>PCSO Individual Medical Assistance Program (IMAP)</strong> ay nagbibigay ng hanggang ₱65,000 para sa mga indigent na pasyente. Ito ay para sa:\n\n• Cancer patients\n• Organ failure cases\n• Rare diseases',
+    steps: ['Pumunta sa pinakamalapit na PCSO branch (hindi online)', 'Magdala ng lahat ng documents (original at photocopy)', 'Kumpleto ang Medical Abstract mula sa iyong doktor', 'Maghintay ng 3–5 araw para sa approval'],
+    link: { text: 'Tingnan ang PCSO programa', href: 'programs.html' }
+  },
+  'malasakit': {
+    text: 'Ang <strong>Malasakit Center</strong> ay isang one-stop-shop sa mga pampublikong ospital kung saan maaari kang mag-apply ng maraming programa nang sabay-sabay (PhilHealth, PCSO, DOH AHFP, at DSWD).',
+    steps: ['Hanapin ang Malasakit Center sa iyong ospital (karaniwang nasa ground floor)', 'Magdala ng Medical Abstract, hospital bills, at valid ID', 'Pag-uusapan ng staff ang mga programa na puwede mong ma-avail', 'Lahat ng applications ay ginagawa sa iisang lugar'],
+    link: { text: 'Tingnan ang Malasakit Center sa iyong lugar', href: 'programs.html' }
+  },
+  'dokumento': {
+    text: 'Para sa karamihan ng medical assistance programs sa Manila, kailangan mo ng mga sumusunod na dokumento:',
+    steps: ['<strong>Valid ID</strong> (SSS, GSIS, Passport, PhilSys ID, etc.)', '<strong>Medical Certificate</strong> o Abstract mula sa doktor', '<strong>PhilHealth MDR</strong> (Member Data Record) — i-download sa PhilHealth website', '<strong>Certificate of Indigency</strong> mula sa Barangay mo', '<strong>Hospital Bills</strong> o Statement of Account (kung naka-hospital)'],
+    link: { text: 'I-upload ang mga dokumento', href: 'documents.html' }
+  },
+  'certificate of indigency': {
+    text: 'Ang <strong>Certificate of Indigency</strong> ay mula sa iyong <strong>Barangay Hall</strong>. Libre ito at karaniwang nai-release agad.\n\nHintayin mo ang Barangay Captain o Chairperson, at magdala ng:',
+    steps: ['Valid ID', 'Proof of residency (utility bill, rental contract)', 'Kung minsan, kailangan ng sworn statement ng income'],
+  },
+  'na-return': {
+    text: 'Kung <strong>na-return ang iyong application</strong>, hindi ito katapusan. Ito ay nangangahulugang may kulang sa iyong mga dokumento o may mali sa impormasyon.\n\nMga dapat gawin:',
+    steps: ['Tingnan ang notification/letter para sa detalye ng rason', 'I-complete ang nawawalang dokumento', 'Siguraduhing updated ang Medical Certificate (hindi lalagpas ng 30 araw)', 'Ibalik ang kumpleto na set ng documents sa opisina'],
+    link: { text: 'Tingnan ang iyong returned application', href: 'tracking.html' }
+  },
+  'sampaloc': {
+    text: 'Para sa mga residente ng <strong>Sampaloc, Manila</strong>, ang pinakamalapit na mga government medical assistance offices ay:',
+    steps: ['<strong>Philippine General Hospital (PGH)</strong> — may Malasakit Center; may PhilHealth at PCSO counters', '<strong>Gat Andres Bonifacio Memorial Medical Center</strong> — Sta. Cruz, Manila (15 min mula Sampaloc)', '<strong>Sampaloc District Health Center</strong> — para sa barangay-level na serbisyo'],
+  },
+  'doh ahfp': {
+    text: 'Ang <strong>DOH Assistance to Indigent Patients Fund Program (AHFP)</strong> ay nagbibigay ng financial assistance hanggang ₱20,000 para sa mga indigent na pasyente.',
+    steps: ['Available sa lahat ng DOH hospitals', 'Mag-apply sa Social Work Department ng ospital', 'Kailangan ng Certificate of Indigency mula sa barangay', 'Kasama sa Malasakit Center — pwedeng mag-apply doon'],
+  },
+  '4ps': {
+    text: 'Ang <strong>4Ps (Pantawid Pamilyang Pilipino Program)</strong> ay isang conditional cash transfer program ng DSWD. Kung ikaw ay 4Ps beneficiary, eligible ka sa maraming dagdag na benepisyo tulad ng:',
+    steps: ['Libreng PhilHealth coverage (Sponsored Program)', 'Priority sa PCSO at DOH programs', 'Educational assistance para sa mga anak', 'Libre sa Certificate of Indigency (karaniwang automatic)'],
+  },
+};
+
+const DEFAULT_RESPONSES = [
+  'Salamat sa iyong tanong! Based sa iyong profile, puwede kang tumingin sa mga matched programs para sa mas specific na impormasyon. Nandito ako para tulungan ka! 😊',
+  'Magandang tanong! Para sa mas accurate na sagot, makipag-ugnayan sa iyong barangay health worker o pumunta sa pinakamalapit na government hospital. Pero puwede akong tumulong sa pangkalahatan.',
+  'Narinig ko ang iyong tanong. Maaari mo akong tanungin tungkol sa PhilHealth, PCSO, DOH programs, o mga dokumentong kailangan. Subukan mong maging specific para mas matulungan kita!',
+];
+
+function getBotResponse(msg) {
+  const m = msg.toLowerCase();
+  if (m.includes('z benefit') || m.includes('z-benefit')) return BOT_RESPONSES['philhealth z'];
+  if (m.includes('pcso')) return BOT_RESPONSES['pcso'];
+  if (m.includes('malasakit')) return BOT_RESPONSES['malasakit'];
+  if (m.includes('4ps') || m.includes('pantawid') || m.includes('dswd')) return BOT_RESPONSES['4ps'];
+  if (m.includes('doh ahfp') || m.includes('ahfp')) return BOT_RESPONSES['doh ahfp'];
+  if (m.includes('indigency') || m.includes('certificate of indigency')) return BOT_RESPONSES['certificate of indigency'];
+  if (m.includes('dokumento') || m.includes('document') || m.includes('kailangan')) return BOT_RESPONSES['dokumento'];
+  if (m.includes('na-return') || m.includes('returned') || m.includes('na return') || m.includes('bumalik')) return BOT_RESPONSES['na-return'];
+  if (m.includes('sampaloc') || m.includes('manila') || m.includes('malapit')) return BOT_RESPONSES['sampaloc'];
+  if (m.includes('philhealth')) return BOT_RESPONSES['philhealth'];
+  return { text: DEFAULT_RESPONSES[Math.floor(Math.random() * DEFAULT_RESPONSES.length)] };
+}
+
+function appendMessage(who, content, isHtml = true) {
+  const wrap = document.createElement('div');
+  wrap.className = `chat-message ${who}`;
+  const time = new Date().toLocaleTimeString('fil', { hour: '2-digit', minute: '2-digit' });
+
+  if (who === 'user') {
+    wrap.innerHTML = `<div><div class="chat-bubble user">${isHtml ? content : escapeHtml(content)}</div><div class="chat-time" style="text-align:right;">Ikaw · ${time}</div></div><div class="chat-avatar user-avatar" style="background:var(--color-primary);color:white;font-family:var(--font-heading);font-weight:700;font-size:var(--text-sm);">JC</div>`;
+  } else {
+    wrap.innerHTML = `<div class="chat-avatar"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div>${content}<div class="chat-time">Paro · ${time}</div></div>`;
+  }
+  messagesEl.appendChild(wrap);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return wrap;
+}
+
+function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+function buildBotBubble(data) {
+  let html = `<div class="chat-bubble">${data.text}`;
+  if (data.steps && data.steps.length) {
+    html += `<ol style="margin:0.625rem 0 0;padding-left:1.25rem;font-size:var(--text-sm);line-height:1.8;">`;
+    data.steps.forEach(s => { html += `<li>${s}</li>`; });
+    html += `</ol>`;
+  }
+  if (data.link) {
+    html += `<a href="${data.link.href}" class="chat-link-btn" style="display:inline-flex;align-items:center;gap:0.375rem;margin-top:0.75rem;background:var(--color-primary);color:white;padding:0.5rem 0.875rem;border-radius:var(--radius-md);font-size:var(--text-xs);font-weight:700;text-decoration:none;">${data.link.text} →</a>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function showTyping() {
+  const wrap = document.createElement('div');
+  wrap.className = 'chat-message bot';
+  wrap.id = 'typing-indicator';
+  wrap.innerHTML = `<div class="chat-avatar"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div><div class="chat-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>`;
+  messagesEl.appendChild(wrap);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function removeTyping() { const el = document.getElementById('typing-indicator'); if (el) el.remove(); }
+
+function sendMessage(text) {
+  if (!text.trim()) return;
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+
+  // Remove prompt chips after first use
+  const chips = document.getElementById('prompt-chips');
+  if (chips && chips.parentElement) chips.parentElement.style.display = 'none';
+
+  appendMessage('user', escapeHtml(text));
+  showTyping();
+  const delay = 900 + Math.random() * 900;
+  setTimeout(() => {
+    removeTyping();
+    const resp = getBotResponse(text);
+    appendMessage('bot', buildBotBubble(resp));
+  }, delay);
+}
+
+sendBtn.addEventListener('click', () => sendMessage(inputEl.value));
+
+function handleEnter(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(inputEl.value); }
+}
+
+// Auto-resize textarea
+inputEl.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+// Prompt chips
+document.querySelectorAll('.prompt-chip').forEach(btn => {
+  btn.addEventListener('click', () => sendMessage(btn.dataset.prompt));
+});
+
+// Clear chat
+document.getElementById('clear-chat').addEventListener('click', () => {
+  if (confirm('Burahin ang kasalukuyang chat?')) location.reload();
+});
+</script>
+</body>
+</html>

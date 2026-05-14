@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paro — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,600;1,9..144,700;1,9..144,800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/paro.css" />
+  <style>
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.75rem; }
+    .quick-action { background: white; border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.375rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all var(--transition-base); text-decoration: none; color: inherit; }
+    .quick-action:hover { border-color: var(--color-primary); background: var(--color-primary-50); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .quick-action-icon { width: 46px; height: 46px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .quick-action-icon svg { width: 22px; height: 22px; }
+    .qa-green { background: var(--color-primary-100); color: var(--color-primary); }
+    .qa-accent { background: var(--color-accent-light); color: var(--color-accent-dark); }
+    .qa-blue { background: var(--color-info-bg); color: var(--color-info); }
+    .qa-purple { background: #ede9fe; color: #5b21b6; }
+    .program-scroll { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 0.75rem; scrollbar-width: none; }
+    .program-scroll::-webkit-scrollbar { display: none; }
+    .prog-mini { background: white; border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.25rem; min-width: 240px; max-width: 240px; flex-shrink: 0; box-shadow: var(--shadow-card); transition: all var(--transition-base); cursor: pointer; }
+    .prog-mini:hover { border-color: var(--color-primary); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .prog-mini-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.875rem; }
+    .prog-logo-sm { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 700; color: white; flex-shrink: 0; }
+    .prog-mini-name { font-weight: 700; font-size: var(--text-sm); line-height: 1.3; }
+    .prog-mini-score { margin-left: auto; font-family: var(--font-heading); font-size: 1rem; font-weight: 800; color: var(--color-primary); }
+    .activity-item { display: flex; gap: 0.875rem; align-items: flex-start; padding: 0.875rem 0; border-bottom: 1px solid var(--color-border); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .activity-icon svg { width: 16px; height: 16px; }
+    .section-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .section-row-title { font-family: var(--font-heading); font-size: var(--text-lg); font-weight: 700; }
+    .content-cols { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start; }
+    @media(max-width:1024px){ .content-cols { grid-template-columns: 1fr; } }
+    @media(max-width:768px){ .dash-grid { grid-template-columns: 1fr 1fr; } }
+    @media(max-width:480px){ .dash-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ───────────────────────────────── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html" class="paro-logo">
+      <div class="paro-logo-mark"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+      <span class="paro-logo-text">Paro</span>
+    </a>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="sidebar-nav-item active" data-nav-page="dashboard.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="eligibility.html" class="sidebar-nav-item" data-nav-page="eligibility.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      Eligibility Wizard
+    </a>
+    <a href="programs.html" class="sidebar-nav-item" data-nav-page="programs.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect width="6" height="4" x="9" y="3" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
+      Mga Programa
+      <span class="badge badge-primary nav-badge">5</span>
+    </a>
+    <a href="checklist.html" class="sidebar-nav-item" data-nav-page="checklist.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Requirements
+    </a>
+    <a href="documents.html" class="sidebar-nav-item" data-nav-page="documents.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Mga Dokumento
+    </a>
+    <a href="tracking.html" class="sidebar-nav-item" data-nav-page="tracking.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Application Tracker
+      <span class="badge badge-warning nav-badge">1</span>
+    </a>
+    <div class="sidebar-section-label">Komunidad</div>
+    <a href="community.html" class="sidebar-nav-item" data-nav-page="community.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Verified Tips
+    </a>
+    <a href="assistant.html" class="sidebar-nav-item" data-nav-page="assistant.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      AI Assistant
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar avatar-md avatar-primary">JC</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:var(--text-sm);truncate">Juan Carlos A.</div>
+        <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Sampaloc, Manila</div>
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-text-muted);flex-shrink:0;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
+  </div>
+</aside>
+
+<!-- ── TOPBAR ─────────────────────────────────── -->
+<header class="topbar">
+  <button id="menu-toggle" style="display:none;background:none;border:none;cursor:pointer;padding:0.375rem;color:var(--color-text-muted);" title="Menu">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div>
+    <div style="font-family:var(--font-heading);font-size:var(--text-lg);font-weight:700;">Magandang umaga, Juan Carlos 👋</div>
+    <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Miyerkules, Mayo 14, 2025 · Sampaloc, Manila</div>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:0.75rem;">
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="fil">FIL</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <button style="background:none;border:none;cursor:pointer;padding:0.375rem;position:relative;color:var(--color-text-muted);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span style="position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--color-error);border-radius:50%;border:2px solid white;"></span>
+    </button>
+    <div class="avatar avatar-md avatar-primary" style="cursor:pointer;">JC</div>
+  </div>
+</header>
+<div id="sidebar-overlay" class="hidden"></div>
+
+<!-- ── MAIN CONTENT ───────────────────────────── -->
+<main class="main-content">
+
+  <!-- Alert: pending action -->
+  <div class="alert alert-warning" style="margin-bottom:1.5rem;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <div style="flex:1;">Ang iyong PhilHealth Z Benefit application ay na-return. <strong>May kulang na dokumento.</strong> <a href="tracking.html" style="font-weight:700;text-decoration:underline;">Tingnan ang detalye →</a></div>
+  </div>
+
+  <!-- ── STAT CARDS ── -->
+  <div class="dash-grid">
+    <div class="stat-card reveal reveal-1">
+      <div class="stat-card-icon green">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect width="6" height="4" x="9" y="3" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
+      </div>
+      <div>
+        <div class="stat-card-value">5</div>
+        <div class="stat-card-label">Programa ang Nahanap</div>
+        <div class="stat-card-trend">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          2 bagong programa
+        </div>
+      </div>
+    </div>
+    <div class="stat-card reveal reveal-2">
+      <div class="stat-card-icon accent">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div>
+        <div class="stat-card-value">2</div>
+        <div class="stat-card-label">Applications Pending</div>
+        <div class="stat-card-trend" style="color:var(--color-warning);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+          1 na-return
+        </div>
+      </div>
+    </div>
+    <div class="stat-card reveal reveal-3">
+      <div class="stat-card-icon blue">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <div>
+        <div class="stat-card-value">1/4</div>
+        <div class="stat-card-label">Dokumento ang Handa</div>
+        <div class="stat-card-trend" style="color:var(--color-text-muted);">
+          Para sa Z Benefit
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── QUICK ACTIONS ── -->
+  <div class="section-row" style="margin-bottom:0.875rem;">
+    <div class="section-row-title">Mabilis na Aksyon</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1.75rem;">
+    <a href="eligibility.html" class="quick-action">
+      <div class="quick-action-icon qa-green"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+      <div><div style="font-weight:700;font-size:var(--text-sm);">Bagong Wizard</div><div style="font-size:var(--text-xs);color:var(--color-text-muted);">I-update ang profile</div></div>
+    </a>
+    <a href="tracking.html" class="quick-action">
+      <div class="quick-action-icon qa-accent"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div><div style="font-weight:700;font-size:var(--text-sm);">Track Application</div><div style="font-size:var(--text-xs);color:var(--color-text-muted);">1 pending</div></div>
+    </a>
+    <a href="documents.html" class="quick-action">
+      <div class="quick-action-icon qa-blue"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+      <div><div style="font-weight:700;font-size:var(--text-sm);">I-upload Docs</div><div style="font-size:var(--text-xs);color:var(--color-text-muted);">3 kulang pa</div></div>
+    </a>
+    <a href="assistant.html" class="quick-action">
+      <div class="quick-action-icon qa-purple"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div><div style="font-weight:700;font-size:var(--text-sm);">Tanungin ang AI</div><div style="font-size:var(--text-xs);color:var(--color-text-muted);">Anumang tanong</div></div>
+    </a>
+  </div>
+
+  <div class="content-cols">
+    <div>
+      <!-- ── MATCHED PROGRAMS ── -->
+      <div class="section-row">
+        <div class="section-row-title">Mga Program na Para Sa Iyo</div>
+        <a href="programs.html" class="btn btn-ghost btn-sm">Tingnan lahat <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      </div>
+      <div class="program-scroll" style="margin-bottom:1.75rem;">
+        <a href="checklist.html" class="prog-mini" style="text-decoration:none;color:inherit;">
+          <div class="prog-mini-header">
+            <div class="prog-logo-sm" style="background:#2563eb;">PH</div>
+            <div style="flex:1;">
+              <div class="prog-mini-name">PhilHealth Z Benefit</div>
+              <div style="font-size:0.6rem;color:var(--color-text-muted);">₱100,000 coverage</div>
+            </div>
+            <div class="prog-mini-score">92%</div>
+          </div>
+          <div class="progress-bar" style="height:5px;margin-bottom:0.75rem;"><div class="progress-fill" style="width:92%;"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="badge badge-primary">4 docs</span>
+            <span style="font-size:var(--text-xs);color:var(--color-primary);font-weight:600;">Tingnan →</span>
+          </div>
+        </a>
+        <a href="programs.html" class="prog-mini" style="text-decoration:none;color:inherit;">
+          <div class="prog-mini-header">
+            <div class="prog-logo-sm" style="background:#059669;">PCSO</div>
+            <div style="flex:1;">
+              <div class="prog-mini-name">PCSO Indiv. Medical Assistance</div>
+              <div style="font-size:0.6rem;color:var(--color-text-muted);">Hanggang ₱65,000</div>
+            </div>
+            <div class="prog-mini-score">87%</div>
+          </div>
+          <div class="progress-bar" style="height:5px;margin-bottom:0.75rem;"><div class="progress-fill" style="width:87%;"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="badge badge-primary">6 docs</span>
+            <span style="font-size:var(--text-xs);color:var(--color-primary);font-weight:600;">Tingnan →</span>
+          </div>
+        </a>
+        <a href="programs.html" class="prog-mini" style="text-decoration:none;color:inherit;">
+          <div class="prog-mini-header">
+            <div class="prog-logo-sm" style="background:#dc2626;">DOH</div>
+            <div style="flex:1;">
+              <div class="prog-mini-name">Malasakit Center</div>
+              <div style="font-size:0.6rem;color:var(--color-text-muted);">One-stop shop</div>
+            </div>
+            <div class="prog-mini-score">85%</div>
+          </div>
+          <div class="progress-bar" style="height:5px;margin-bottom:0.75rem;"><div class="progress-fill" style="width:85%;"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="badge badge-primary">3 docs</span>
+            <span style="font-size:var(--text-xs);color:var(--color-primary);font-weight:600;">Tingnan →</span>
+          </div>
+        </a>
+        <a href="programs.html" class="prog-mini" style="text-decoration:none;color:inherit;border-color:var(--color-primary-200);background:var(--color-primary-50);">
+          <div style="text-align:center;padding:1.25rem 0.5rem;">
+            <div style="font-size:2rem;margin-bottom:0.5rem;">+2</div>
+            <div style="font-size:var(--text-sm);font-weight:700;color:var(--color-primary);">programa pa</div>
+            <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:0.25rem;">Tingnan ang lahat</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- ── RECENT ACTIVITY ── -->
+      <div class="section-row">
+        <div class="section-row-title">Mga Kamakailang Aktibidad</div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0.75rem 1.25rem;">
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--color-error-bg);color:var(--color-error);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:var(--text-sm);font-weight:600;">PhilHealth Z Benefit — Na-return</div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Kulang ang Medical Certificate. Kailangan ng updated na kopya.</div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--color-text-muted);flex-shrink:0;">Ngayon, 9:14am</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--color-primary-100);color:var(--color-primary);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:var(--text-sm);font-weight:600;">PhilHealth MDR — Na-upload</div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Matagumpay na nai-upload ang iyong Member Data Record.</div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--color-text-muted);flex-shrink:0;">Kahapon, 3:22pm</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--color-success-bg);color:var(--color-success);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:var(--text-sm);font-weight:600;">Eligibility Wizard — Natapos</div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-muted);">5 programa ang nahanap para sa iyong profile.</div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--color-text-muted);flex-shrink:0;">Lunes, 10:45am</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--color-info-bg);color:var(--color-info);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:var(--text-sm);font-weight:600;">AI Assistant — Nagkumpleto ng sesyon</div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Natanggap ang impormasyon tungkol sa PCSO at PhilHealth.</div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--color-text-muted);flex-shrink:0;">Lunes, 10:30am</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+      <!-- Application Status -->
+      <div class="section-row"><div class="section-row-title">Status ng Application</div><a href="tracking.html" class="btn btn-ghost btn-sm">Tingnan lahat</a></div>
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-body" style="padding:1.25rem;">
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+            <div style="width:36px;height:36px;background:#2563eb;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;color:white;flex-shrink:0;">PH</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:var(--text-sm);">PhilHealth Z Benefit</div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Inilabas: Mayo 10, 2025</div>
+            </div>
+            <span class="status-pill status-warning">
+              <span class="status-dot"></span>
+              Na-return
+            </span>
+          </div>
+          <div class="timeline">
+            <div class="timeline-item completed">
+              <div class="timeline-dot"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="timeline-content"><div class="timeline-title">Na-submit</div><div class="timeline-time">Mayo 10, 10:00am</div></div>
+            </div>
+            <div class="timeline-item error">
+              <div class="timeline-dot"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+              <div class="timeline-content"><div class="timeline-title">Na-return — Kulang ang dokumento</div><div class="timeline-time">Ngayon, 9:14am</div></div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="opacity:0.4;">3</div>
+              <div class="timeline-content" style="opacity:0.5;"><div class="timeline-title">Sa ilalim ng review</div></div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="opacity:0.4;">4</div>
+              <div class="timeline-content" style="opacity:0.5;"><div class="timeline-title">Aprubado</div></div>
+            </div>
+          </div>
+          <a href="tracking.html" class="btn btn-primary btn-sm btn-full" style="margin-top:1rem;">Ayusin ang Application</a>
+        </div>
+      </div>
+
+      <!-- Community tip widget -->
+      <div class="section-row"><div class="section-row-title">Tip ng Araw</div><a href="community.html" class="btn btn-ghost btn-sm">Tingnan lahat</a></div>
+      <div class="tip-card">
+        <div class="tip-card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+        <div>
+          <div style="display:flex;gap:0.375rem;margin-bottom:0.25rem;"><span class="contributor-badge cb-bhw">BHW · Sampaloc</span></div>
+          <div class="tip-card-text">"Para sa PCSO, pumunta sa branch mismo — mas mabilis kaysa online. Dalhin ang lahat ng dokumento na <strong>original at photocopy</strong> para hindi kailangang bumalik."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── BOTTOM NAV (mobile) ───────────────────── -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="bottom-nav-item active">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+    Home
+  </a>
+  <a href="eligibility.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    Wizard
+  </a>
+  <a href="programs.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect width="6" height="4" x="9" y="3" rx="1"/></svg>
+    Programa
+  </a>
+  <a href="tracking.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Tracker
+  </a>
+  <a href="assistant.html" class="bottom-nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    AI
+  </a>
+</nav>
+
+<script src="js/paro.js"></script>
+<script>
+// Show menu toggle on mobile
+if (window.innerWidth <= 768) {
+  document.getElementById('menu-toggle').style.display = 'flex';
+}
+window.addEventListener('resize', () => {
+  const t = document.getElementById('menu-toggle');
+  if (t) t.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+});
+</script>
+</body>
+</html>
